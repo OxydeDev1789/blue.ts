@@ -28,7 +28,7 @@
    <li>🔍 Best search engines: YouTube, Spotify, SoundCloud</li>
    <li>🔄 Advanced autoplay feature</li>
    <li>⚡ Faster, simple, and stable client</li>
-   <li>🆙 Supports the latest Lavalink version: 4.0.4</li>
+   <li>🆙 Supports the latest Lavalink version: 4.0.7</li>
    <li>🌐 Compatible with discord.js, eris, oceanicjs</li>
    <li>🔌 Plugins support</li>
  </ul>
