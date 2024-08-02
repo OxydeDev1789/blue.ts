@@ -53,7 +53,7 @@ npm install blue.ts
 yarn add blue.ts
 ```
 <br>
- <h2 id="quickstart">🚀 Quick Start with Discord.js 13</h2>
+ <h2 id="quickstart">🚀 Quick Start with Discord.js V13</h2>
 
 ```javascript
 const { Client, Intents } = require("discord.js");
@@ -119,6 +119,83 @@ client.on("messageCreate", async (message) => {
     } else {
       player.queue.add(res.tracks[0]);
       message.reply(`Track: **${res.tracks[0].info.title}** added to queue.`);
+    }
+    if (!player.queue?.current)
+      player.play();
+  }
+});
+
+//Replace the TOKEN with the actual bot token
+client.login("TOKEN");
+```
+<br>
+<br>
+ <h2 id="quickstart">🚀 Quick Start with Discord.js V14</h2>
+
+```javascript
+const { Client, Intents } = require("discord.js");
+const { Blue, Events, Types, Library } = require("blue.ts");
+
+const client = new Client({
+  //...client constructor
+});
+
+//Lavalink Nodes
+const nodes = [
+  {
+    host: "localhost",
+    port: 2333,
+    password: "youshallnotpass",
+    secure: false
+  }
+];
+
+//Blue Manager Options
+const options = {
+  spotify: {
+    client_id: "CLIENT_ID",  //spotify client ID
+    client_secret: "CLIENT_SECRET" //spotify client Secret
+  },
+  autoplay: true,
+  version: "v4",
+  library: Library.DiscordJs
+};
+
+//Declaring the manager
+client.manager = new Blue(nodes, options);
+
+//ready event handler to initiate the manager
+client.on("ready", async () => {
+  console.log("Client is ready!");
+  client.manager.init(client);
+});
+
+client.on("messageCreate", async (message) => {
+  if(message.author.bot) return;
+  if(message.content.startsWith("!play")) {
+
+    let player = client.manager.players.get(message.guild.id);
+
+    if(!player) {
+      player = await client.manager.create({
+        voiceChannel: message.member?.voice?.channel?.id || null,
+        textChannel: message.channel?.id,
+        guildId: message.guild.id,
+        selfDeaf: true,
+        selfMute: false
+      });
+    }
+
+    const res = await client.manager.search({ query: "summertime sadness", source: "spotify" }, message.author);
+
+    if (!res) return message.reply({content: "song not found"});
+
+    if (res.loadType == Types.LOAD_SP_ALBUMS || res.loadType == Types.LOAD_SP_PLAYLISTS) {
+      player.queue.add(...res.tracks);
+      message.reply({content: `Loaded **${res.length}** tracks from \`${res.name}\``});
+    } else {
+      player.queue.add(res.tracks[0]);
+      message.reply({content: `Track: **${res.tracks[0].info.title}** added to queue.`});
     }
     if (!player.queue?.current)
       player.play();
